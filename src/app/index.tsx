@@ -1,98 +1,101 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from "react";
+import { Image, StyleSheet, Text, View, ScrollView, KeyboardAvoidingView, Platform, Alert} from "react-native";
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { Input } from "../components/input";
+import { Button } from "../components/Button";
+import { Link } from "expo-router";
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
+export default function Index() {
+
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+
+    function handleSignIn() {
+        if(!email.trim() || !password.trim()){
+            return Alert.alert("Entrar", "Preencha o email e a senha para entrar")
+        } 
+        Alert.alert("Bem-vindo", `Login realizado com: ${email}`) 
+    }
+
     return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+        <KeyboardAvoidingView style={{ flex: 1 }}
+        behavior={Platform.select({ios: "padding", android: "height"})}
+        > 
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} 
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        >
+        <View style={styles.container}>
+            <Image
+                source={require("../assets/img1.png")}
+                style={styles.illustration}
+            />
+            <Text style={styles.title}>Entrar </Text>
+            <Text style={styles.subtitle}>Acesse sua conta com email e senha</Text>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+            <View style={styles.form}>
+                <Input 
+                placeholder="Email" 
+                keyboardType="email-address"
+                onChangeText={(text) => setEmail(text)} 
+                //onChangeText={console.log}
+                //onChangeText={(text) => console.log(text)}
+                />
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+                <Input 
+                placeholder="Senha" 
+                secureTextEntry
+                onChangeText={(text) => setPassword(text)}
+                />
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
-  );
+                <Button label="Entrar" onPress={handleSignIn} />
+            </View>
+            <Text style={styles.footerText}>
+                Não tem uma conta? {""}
+                <Link href="/singup" style={styles.footerlink}>
+                Cadastre-se aqui.
+                </Link> 
+            </Text>
+        </View>
+        </ScrollView>
+        </KeyboardAvoidingView>
+    )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
-});
+    container: {
+        flex: 1,
+        backgroundColor: '#FDFDFD',
+        padding: 32,
+    },
+    illustration: {
+        width: "100%",
+        height: 330,
+        resizeMode: 'contain',
+        marginTop: 62,
+    },
+    title: {
+        fontSize: 32,
+        fontWeight: 900,
+    },
+    subtitle: {
+        fontSize: 16,
+    },
+
+    form: {
+        marginTop: 24,
+        gap: 12
+    },
+    footerText: {
+        textAlign: "center",
+        marginTop: 24,
+        color: "#585860",
+    },
+    footerlink: {
+        color: '#032ad7',
+        fontWeight: 700, 
+    }
+
+})
+
